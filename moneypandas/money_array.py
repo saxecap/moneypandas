@@ -81,7 +81,7 @@ class MoneyArray(NumPyBackedExtensionArrayMixin):
         if dtype and dtype != self.dtype:
             raise TypeError("Can only construct MoneyArray with underlying (f64, U3) not {}".format(dtype))
 
-        values, self.default_money_code = _to_money_array(values, default_money_code=default_money_code)  # TODO: avoid potential copy
+        values, self.default_money_code = _to_money_array(values, default_money_code=default_money_code, errors=errors)  # TODO: avoid potential copy
         # TODO: dtype?
         if copy:
             values = values.copy()
