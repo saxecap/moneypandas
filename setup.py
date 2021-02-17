@@ -8,7 +8,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 install_requires = [
-    "pandas>=0.23.0",
+    "pandas", # for testing "pandas<1.0.0",
+    "numpy", # for testing "numpy<1.20.0",
     "six",
     "iso4217parse",
     "money"

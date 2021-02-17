@@ -6,12 +6,14 @@ import money
 from .dtypes import money_patterns
 
 
-def to_money(values, default_money_code=None):
+def to_money(values, default_money_code=None, errors='raise'):
     """Convert values to MoneyArray
 
     Parameters
     ----------
     values : int, str, bytes, or sequence of those
+    default_money_code : ISO code to use when currency is not defined explicitly
+    errors : {'raise', 'coerce', 'ignore'} -- 'raise' to always raise, 'coerce' to replace with NaN, 'ignore' to return input
 
     Returns
     -------
@@ -34,14 +36,14 @@ def to_money(values, default_money_code=None):
         values = [values]
 
     values, default_money_code = _to_money_array(
-        values, default_money_code=default_money_code)
+        values, default_money_code=default_money_code, errors=errors)
     return MoneyArray(
         values,
         default_money_code=default_money_code
     )
 
 
-def _to_money_array(values, default_money_code=None):
+def _to_money_array(values, default_money_code=None, errors='raise'):
     """ Method to convert a money object to a money array """
     from .money_array import MoneyType, MoneyArray
 
@@ -50,11 +52,16 @@ def _to_money_array(values, default_money_code=None):
             default_money_code = default_money_code
         return values.data, default_money_code
 
-    values = [_as_money_object(v, default_money_code) for v in values]
+    try:
+        values = [_as_money_object(v, default_money_code, coerce_on_error=(errors == 'coerce')) for v in values]
+    except ValueError as e:
+        if errors == 'ignore':
+            return values
+        raise e
 
     return np.atleast_1d(np.asarray(values, dtype=MoneyType._record_type)), default_money_code
 
-def _as_money_object(val, default_money_code=None):
+def _as_money_object(val, default_money_code=None, coerce_on_error=False):
     """ Method to return a tuple with the monetary value
     and the currency. Attempt to parse 'val' as any Money object.
     Uses regex (money_patterns) to get the amount & the currency.
@@ -91,14 +98,18 @@ def _as_money_object(val, default_money_code=None):
 
     try:
         va = np.float64(val)
-    except TypeError:
+    except (TypeError, ValueError):
         pass
     else:
         if default_money_code:
             cu = default_money_code
             return va, cu
         else:
+            if coerce_on_error:
+                return np.nan
             raise ValueError(
                 "Currency code is unavailable - cannot convert {}. Set a default?".format(val))
 
+    if coerce_on_error:
+        return 0, ''
     raise ValueError("Could not parse {} as money".format(val))
