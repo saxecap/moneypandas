@@ -74,7 +74,7 @@ class MoneyArray(NumPyBackedExtensionArrayMixin):
     can_hold_na = True
     default_money_code = None
 
-    def __init__(self, values, default_money_code=None, dtype=None, copy=False):
+    def __init__(self, values, default_money_code=None, dtype=None, copy=False, errors='raise'):
         from .parser import _to_money_array
 
         # TODO: copy

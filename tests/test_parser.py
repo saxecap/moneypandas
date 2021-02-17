@@ -11,16 +11,18 @@ from moneypandas import parser, MoneyArray
 
 @pytest.mark.parametrize('values', [
     [u'123 EUR',
-     u'234 EUR']
+     u'234 EUR',
+     u'n.a.']
     # TODO: reinstate byte tests
     # [b'\xc0\xa8\x01\x01',
     # b' \x01\r\xb8\x85\xa3\x00\x00\x00\x00\x8a.\x03ps4'],
 ])
 def test_to_money(values):
-    result = parser.to_money(values)
+    result = parser.to_money(values, errors='coerce')
     expected = MoneyArray([
         123,
-        234
+        234,
+        None
     ], 'EUR')
     assert result.equals(expected)
 

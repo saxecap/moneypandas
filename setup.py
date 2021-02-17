@@ -8,7 +8,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 install_requires = [
-    "pandas>=0.23.0",
+    "pandas", # for testing "pandas<1.0.0",
+    "numpy", # for testing "numpy<1.20.0",
     "six",
     "iso4217parse",
     "money"
@@ -20,7 +21,7 @@ tests_require = install_requires + [
 
 setup(
     name='moneypandas',
-    version='0.9.3',
+    version='0.9.4',
     setup_requires=['setuptools_scm'],
     description='Money type for pandas',
     long_description=long_description,
