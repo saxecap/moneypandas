@@ -29,10 +29,13 @@ money_patterns = [(re.compile(r[0]), r[1]) for r in [
         r'(-?\d*\.?\d*\d)\s*([A-Z]{3})',                         # 97GBP
         lambda m: (np.float64(m.group(1)), m.group(2))
     ),
+    (
+        r'(-?\d*\.?\d*\d)\s*([' + ''.join(symbols) + r'])',       # -123.00 £
+        lambda m: (np.float64(m.group(1)), symbols[m.group(2)])
+    ),
 ]]
 
 def is_money(value):
-    # TODO: Better detection
     if isinstance(value, str):
         return any([r[0].match(value) for r in money_patterns])
     elif isinstance(value, bytes):
